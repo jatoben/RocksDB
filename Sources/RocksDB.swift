@@ -45,6 +45,7 @@ public enum DBError: ErrorProtocol, CustomStringConvertible {
   case OpenFailed(String)
   case GetFailed(String)
   case PutFailed(String)
+  case WriteFailed(String)
 
   public var description: String {
     switch self {
@@ -54,7 +55,34 @@ public enum DBError: ErrorProtocol, CustomStringConvertible {
       return "Get failed: \(s)"
     case let PutFailed(s):
       return "Put failed: \(s)"
+    case let WriteFailed(s):
+      return "Write failed: \(s)"
     }
+  }
+}
+
+public class DBBatch {
+  internal var batch: OpaquePointer
+
+  public var count: Int {
+    return Int(rocksdb_writebatch_count(batch))
+  }
+
+  init() {
+    batch = rocksdb_writebatch_create()
+  }
+
+  deinit {
+    rocksdb_writebatch_destroy(batch)
+  }
+
+  func put(_ key: String, value: String) {
+    rocksdb_writebatch_put(batch,
+      key,
+      key.utf8.count,
+      value,
+      value.utf8.count
+    )
   }
 }
 
@@ -93,6 +121,21 @@ public class Database {
     guard err == nil else {
       defer { free(err) }
       throw DBError.PutFailed(String(cString: err!))
+    }
+  }
+
+  func write(_ batch: DBBatch, options: DBWriteOptions? = nil) throws {
+    let opts = options ?? defaultWriteOptions
+    var err: UnsafeMutablePointer<Int8>? = nil
+    rocksdb_write(db,
+      opts.opts,
+      batch.batch,
+      &err
+    )
+
+    guard err == nil else {
+      defer { free(err) }
+      throw DBError.WriteFailed(String(cString: err!))
     }
   }
 

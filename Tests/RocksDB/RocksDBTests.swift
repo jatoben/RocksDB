@@ -35,6 +35,28 @@ class RocksDBTests: XCTestCase {
     }
   }
 
+  func testBatchWrite() {
+    do {
+      let keys = ["foo-batch-1", "foo-batch-2", "foo-batch-3"]
+      let vals = ["bar", "baz", "quux"]
+
+      let db = try Database(path: "/tmp/test")
+      let batch = DBBatch()
+      for i in 0..<keys.count {
+        batch.put(keys[i], value: vals[i])
+      }
+      XCTAssertEqual(batch.count, keys.count)
+      try db.write(batch)
+
+      for i in 0..<keys.count {
+        let val = try db.get(keys[i])
+        XCTAssertEqual(val!, vals[i])
+      }
+    } catch {
+      XCTFail("\(error)")
+    }
+  }
+
   static var allTests : [(String, (RocksDBTests) -> () throws -> Void)] {
     return [
       ("testGetAndPut", testGetAndPut),
