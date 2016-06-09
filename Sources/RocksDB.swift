@@ -96,7 +96,7 @@ public class Database {
     }
   }
 
-  func get(_ key: String, options: DBReadOptions? = nil) throws -> String {
+  func get(_ key: String, options: DBReadOptions? = nil) throws -> String? {
     let opts = options ?? defaultReadOptions
     var err: UnsafeMutablePointer<Int8>? = nil
     var valueLength: Int = 0
@@ -108,11 +108,12 @@ public class Database {
       &err
     )
 
-    guard err == nil, let val = value else {
+    guard err == nil else {
       defer { free(err) }
       throw DBError.PutFailed(String(cString: err!))
     }
 
+    guard let val = value else { return nil }
     return String(cString: val)
   }
 }
