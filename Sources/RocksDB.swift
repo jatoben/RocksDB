@@ -168,6 +168,7 @@ public class Database {
     }
 
     guard let val = value else { return nil }
+    defer { free(val) }
     return String(cString: val)
   }
 }
