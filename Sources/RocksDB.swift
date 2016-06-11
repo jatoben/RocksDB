@@ -76,21 +76,13 @@ public class DBBatch {
     rocksdb_writebatch_destroy(batch)
   }
 
-  func put(_ key: String, value: String) {
+  func put(_ key: DBSlice, value: DBSlice) {
     rocksdb_writebatch_put(batch,
-      key,
-      key.utf8.count,
-      value,
-      value.utf8.count
+      key.dbValue,
+      key.dbLength,
+      value.dbValue,
+      value.dbLength
     )
-  }
-}
-
-private extension String {
-  init(UTF8Bytes bytes: UnsafePointer<Int8>, length: Int) {
-    var buf = [Int8](repeating: 0, count: length + 1)
-    for i in 0..<length { buf[i] = bytes[i] }
-    self.init(cString: buf)
   }
 }
 
@@ -111,7 +103,7 @@ public class DBIterator: IteratorProtocol {
     rocksdb_iter_destroy(iter)
   }
 
-  public func next() -> (String, String)? {
+  public func next() -> (DBEntry, DBEntry)? {
     var keyLength: Int = 0
     var valLength: Int = 0
 
@@ -122,7 +114,9 @@ public class DBIterator: IteratorProtocol {
     guard let key = k, let val = v else { return nil }
 
     defer { rocksdb_iter_next(iter) }
-    return (String(UTF8Bytes: key, length: keyLength), String(UTF8Bytes: val, length: valLength))
+    let keyPointer = UnsafeBufferPointer(start: key, count: keyLength)
+    let valPointer = UnsafeBufferPointer(start: val, count: valLength)
+    return (DBEntry(dbValue: [Int8](keyPointer)), DBEntry(dbValue: [Int8](valPointer)))
   }
 }
 
@@ -162,15 +156,15 @@ public class Database {
     rocksdb_close(db)
   }
 
-  func put(_ key: String, value: String, options: DBWriteOptions? = nil) throws {
+  func put<K: DBSlice, V: DBSlice>(_ key: K, value: V, options: DBWriteOptions? = nil) throws {
     let opts = options ?? defaultWriteOptions
     var err: UnsafeMutablePointer<Int8>? = nil
     rocksdb_put(db,
       opts.opts,
-      key,
-      key.utf8.count,
-      value,
-      value.utf8.count,
+      key.dbValue,
+      key.dbLength,
+      value.dbValue,
+      value.dbLength,
       &err
     )
 
@@ -195,10 +189,10 @@ public class Database {
     }
   }
 
-  func delete(_ key: String, options: DBWriteOptions? = nil) throws {
+  func delete<K: DBSlice>(_ key: K, options: DBWriteOptions? = nil) throws {
     let opts = options ?? defaultWriteOptions
     var err: UnsafeMutablePointer<Int8>? = nil
-    rocksdb_delete(db, opts.opts, key, key.utf8.count, &err)
+    rocksdb_delete(db, opts.opts, key.dbValue, key.dbLength, &err)
 
     guard err == nil else {
       defer { free(err) }
@@ -206,15 +200,15 @@ public class Database {
     }
   }
 
-  func get(_ key: String, options: DBReadOptions? = nil) throws -> String? {
+  func get<K: DBSlice, V: DBSlice>(_ key: K, options: DBReadOptions? = nil) throws -> V? {
     let opts = options ?? defaultReadOptions
     var err: UnsafeMutablePointer<Int8>? = nil
-    var valueLength: Int = 0
+    var valLength: Int = 0
     let value = rocksdb_get(db,
       opts.opts,
-      key,
-      key.utf8.count,
-      &valueLength,
+      key.dbValue,
+      key.dbLength,
+      &valLength,
       &err
     )
 
@@ -225,6 +219,7 @@ public class Database {
 
     guard let val = value else { return nil }
     defer { free(val) }
-    return String(UTF8Bytes: val, length: valueLength)
+    let valPointer = UnsafeBufferPointer(start: val, count: valLength)
+    return V(dbValue: [Int8](valPointer))
   }
 }
