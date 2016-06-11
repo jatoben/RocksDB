@@ -2,9 +2,11 @@ import XCTest
 @testable import RocksDB
 
 class RocksDBTests: XCTestCase {
+  var dbPath: String = "/tmp/rocksdb-test"
+
   func testGetAndPut() {
     do {
-      let db = try Database(path: "/tmp/test")
+      let db = try Database(path: dbPath)
       try db.put("foo", value: "bar")
       let val = try db.get("foo")
       XCTAssertEqual(val!, "bar")
@@ -15,7 +17,7 @@ class RocksDBTests: XCTestCase {
 
   func testNilGet() {
     do {
-      let db = try Database(path: "/tmp/test")
+      let db = try Database(path: dbPath)
       let val = try db.get("baz")
       XCTAssertEqual(val, nil)
     } catch {
@@ -25,7 +27,7 @@ class RocksDBTests: XCTestCase {
 
   func testPutOverwrite() {
     do {
-      let db = try Database(path: "/tmp/test")
+      let db = try Database(path: dbPath)
       try db.put("foo", value: "bar")
       try db.put("foo", value: "baz")
       let val = try db.get("foo")
@@ -37,7 +39,7 @@ class RocksDBTests: XCTestCase {
 
   func testDelete() {
     do {
-      let db = try Database(path: "/tmp/test")
+      let db = try Database(path: dbPath)
       try db.put("foo", value: "bar")
       let val = try db.get("foo")
       XCTAssertEqual(val!, "bar")
@@ -54,7 +56,7 @@ class RocksDBTests: XCTestCase {
       let keys = ["foo-batch-1", "foo-batch-2", "foo-batch-3"]
       let vals = ["bar", "baz", "quux"]
 
-      let db = try Database(path: "/tmp/test")
+      let db = try Database(path: dbPath)
       let batch = DBBatch()
       for i in 0..<keys.count {
         batch.put(keys[i], value: vals[i])
@@ -71,11 +73,43 @@ class RocksDBTests: XCTestCase {
     }
   }
 
+  func testIterate() {
+    do {
+      let db = try Database(path: dbPath)
+      try db.put("foo", value: "bar")
+      let kvs = db.map { ($0, $1) }
+      XCTAssertTrue(kvs.count > 1, "Iterator didn't return enough keys")
+      XCTAssertTrue(kvs.contains { (k, v) in k == "foo" && v == "bar" }, "Iterator didn't contain expected key/value")
+    } catch {
+      XCTFail("\(error)")
+    }
+  }
+
+  func testIteratePrefix() {
+    do {
+      let db = try Database(path: dbPath)
+      try db.put("iterate:one", value: "bar")
+      try db.put("iterate:two", value: "baz")
+      try db.put("iterate:three", value: "quux")
+
+      let iterator = db.makeIterator(keyPrefix: "iterate:")
+      let kvs = IteratorSequence(iterator).map { ($0, $1) }
+      XCTAssertEqual(kvs.count, 3, "Iterator returned wrong number of keys")
+      XCTAssertTrue(kvs.contains { (k, _) in k.hasPrefix("iterate:") }, "Iterator didn't contain expected keys")
+    } catch {
+      XCTFail("\(error)")
+    }
+  }
+
   static var allTests : [(String, (RocksDBTests) -> () throws -> Void)] {
     return [
       ("testGetAndPut", testGetAndPut),
       ("testNilGet", testNilGet),
-      ("testPutOverwrite", testPutOverwrite)
+      ("testPutOverwrite", testPutOverwrite),
+      ("testDelete", testDelete),
+      ("testBatchWrite", testBatchWrite),
+      ("testIterate", testIterate),
+      ("testIteratePrefix", testIteratePrefix)
     ]
   }
 }
