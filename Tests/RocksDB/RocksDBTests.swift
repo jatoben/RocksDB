@@ -35,6 +35,20 @@ class RocksDBTests: XCTestCase {
     }
   }
 
+  func testDelete() {
+    do {
+      let db = try Database(path: "/tmp/test")
+      try db.put("foo", value: "bar")
+      let val = try db.get("foo")
+      XCTAssertEqual(val!, "bar")
+      try db.delete("foo")
+      let val2 = try db.get("foo")
+      XCTAssertNil(val2)
+    } catch {
+      XCTFail("\(error)")
+    }
+  }
+
   func testBatchWrite() {
     do {
       let keys = ["foo-batch-1", "foo-batch-2", "foo-batch-3"]

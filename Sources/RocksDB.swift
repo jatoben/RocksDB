@@ -139,6 +139,17 @@ public class Database {
     }
   }
 
+  func delete(_ key: String, options: DBWriteOptions? = nil) throws {
+    let opts = options ?? defaultWriteOptions
+    var err: UnsafeMutablePointer<Int8>? = nil
+    rocksdb_delete(db, opts.opts, key, key.utf8.count, &err)
+
+    guard err == nil else {
+      defer { free(err) }
+      throw DBError.WriteFailed(String(cString: err!))
+    }
+  }
+
   func get(_ key: String, options: DBReadOptions? = nil) throws -> String? {
     let opts = options ?? defaultReadOptions
     var err: UnsafeMutablePointer<Int8>? = nil
