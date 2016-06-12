@@ -13,6 +13,28 @@ class RocksDBTests: XCTestCase {
     db = nil
   }
 
+  func testOpenFail() {
+    do {
+      _ = try Database(path: "/foo/bar")
+      XCTFail("Opening database at non-existent path should throw")
+    } catch DBError.OpenFailed {
+      /* success */
+    } catch {
+      XCTFail("Unexpected error type thrown: \(error)")
+    }
+  }
+
+  func testOpenForWriteFail() {
+    do {
+      _ = try Database(path: dbPath)
+      XCTFail("Opening database read-write a second time should throw")
+    } catch DBError.OpenFailed {
+      /* success */
+    } catch {
+      XCTFail("Unexpected error type thrown: \(error)")
+    }
+  }
+
   func testGetAndPut() {
     do {
       try db.put("foo", value: "bar")

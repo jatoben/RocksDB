@@ -2,18 +2,15 @@ import CRocksDB
 
 public enum DBError: ErrorProtocol, CustomStringConvertible {
   case OpenFailed(String)
-  case GetFailed(String)
-  case PutFailed(String)
+  case ReadFailed(String)
   case WriteFailed(String)
 
   public var description: String {
     switch self {
     case let OpenFailed(s):
       return "Open failed: \(s)"
-    case let GetFailed(s):
-      return "Get failed: \(s)"
-    case let PutFailed(s):
-      return "Put failed: \(s)"
+    case let ReadFailed(s):
+      return "Read failed: \(s)"
     case let WriteFailed(s):
       return "Write failed: \(s)"
     }
@@ -65,12 +62,21 @@ public class Database {
   init(path: String, options: DBOptions? = nil) throws {
     let o = options ?? DBOptions()
     var err: UnsafeMutablePointer<Int8>? = nil
-    db = rocksdb_open(o.options(), path, &err)
+    var dbx = rocksdb_open(o.options(), path, &err)
 
     guard err == nil else {
       defer { free(err) }
       throw DBError.OpenFailed(String(cString: err!))
     }
+
+    /* Need this rigamarole to avoid an IUO error because rocksdb_open is
+     * typed to return an OpaquePointer!
+     */
+    guard dbx != nil else {
+      throw DBError.OpenFailed("Unknown error")
+    }
+
+    db = dbx!
   }
 
   deinit {
@@ -91,7 +97,7 @@ public class Database {
 
     guard err == nil else {
       defer { free(err) }
-      throw DBError.PutFailed(String(cString: err!))
+      throw DBError.WriteFailed(String(cString: err!))
     }
   }
 
@@ -135,7 +141,7 @@ public class Database {
 
     guard err == nil else {
       defer { free(err) }
-      throw DBError.PutFailed(String(cString: err!))
+      throw DBError.ReadFailed(String(cString: err!))
     }
 
     guard let val = value else { return nil }
