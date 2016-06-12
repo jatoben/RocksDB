@@ -43,6 +43,10 @@ public class DBBatch {
       value.dbLength
     )
   }
+
+  func delete(_ key: DBSlice) {
+    rocksdb_writebatch_delete(batch, key.dbValue, key.dbLength)
+  }
 }
 
 public class Database {

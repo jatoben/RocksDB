@@ -57,17 +57,22 @@ class RocksDBTests: XCTestCase {
       let vals = ["bar", "baz", "quux"]
 
       let db = try Database(path: dbPath)
+      try db.put("foo", value: "bar")
+
       let batch = DBBatch()
       for i in 0..<keys.count {
         batch.put(keys[i], value: vals[i])
       }
-      XCTAssertEqual(batch.count, keys.count)
+      batch.delete("foo")
+      XCTAssertEqual(batch.count, keys.count + 1)
       try db.write(batch)
 
       for i in 0..<keys.count {
         let val = try db.get(keys[i]) as String?
         XCTAssertEqual(val!, vals[i])
       }
+
+      XCTAssertNil(try db.get("foo") as String?, "Key not deleted in batch write")
     } catch {
       XCTFail("\(error)")
     }
