@@ -78,6 +78,28 @@ class RocksDBTests: XCTestCase {
     }
   }
 
+  func testBatchMultiWrite() {
+    do {
+      let entries = [
+        "foo-batch-1": "bar",
+        "foo-batch-2": "baz",
+        "foo-batch-3": "quux"
+      ]
+
+      let db = try Database(path: dbPath)
+      let batch = DBBatch()
+      batch.put(entries)
+      batch.delete(["foo-batch-2", "foo-batch-3"])
+      try db.write(batch)
+
+      XCTAssertEqual(try db.get("foo-batch-1") as String!, "bar", "Key shouldn't have been deleted in batch delete")
+      XCTAssertNil(try db.get("foo-batch-2") as String?, "Key not deleted in batch delete")
+      XCTAssertNil(try db.get("foo-batch-3") as String?, "Key not deleted in batch delete")
+    } catch {
+      XCTFail("\(error)")
+    }
+  }
+
   func testIterate() {
     do {
       let db = try Database(path: dbPath)

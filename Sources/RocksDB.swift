@@ -44,15 +44,23 @@ public class DBBatch {
     )
   }
 
+  func put<K: DBSlice, V: DBSlice>(_ entries: [K: V]) {
+    entries.forEach { put($0, value: $1) }
+  }
+
   func delete(_ key: DBSlice) {
     rocksdb_writebatch_delete(batch, key.dbValue, key.dbLength)
+  }
+
+  func delete<S: Sequence where S.Iterator.Element == DBSlice>(_ keys: S, options: DBWriteOptions? = nil) {
+    keys.forEach { delete($0) }
   }
 }
 
 public class Database {
   internal var db: OpaquePointer
-  internal lazy var defaultReadOptions = { DBReadOptions() }()
-  internal lazy var defaultWriteOptions = { DBWriteOptions() }()
+  internal lazy var defaultReadOptions = DBReadOptions()
+  internal lazy var defaultWriteOptions = DBWriteOptions()
 
   init(path: String, options: DBOptions? = nil) throws {
     let o = options ?? DBOptions()
