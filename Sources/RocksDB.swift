@@ -59,10 +59,12 @@ public class Database {
   internal lazy var defaultReadOptions = DBReadOptions()
   internal lazy var defaultWriteOptions = DBWriteOptions()
 
-  init(path: String, options: DBOptions? = nil) throws {
+  init(path: String, readOnly: Bool = false, options: DBOptions? = nil) throws {
     let o = options ?? DBOptions()
     var err: UnsafeMutablePointer<Int8>? = nil
-    var dbx = rocksdb_open(o.options(), path, &err)
+    var dbx = readOnly ?
+      rocksdb_open_for_read_only(o.options(), path, 0, &err) :
+      rocksdb_open(o.options(), path, &err)
 
     guard err == nil else {
       defer { free(err) }

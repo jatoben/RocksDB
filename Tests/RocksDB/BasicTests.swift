@@ -1,7 +1,7 @@
 import XCTest
 @testable import RocksDB
 
-class RocksDBTests: XCTestCase {
+class BasicTests: XCTestCase {
   var dbPath: String = "/tmp/rocksdb-test"
   var db: Database!
 
@@ -11,28 +11,6 @@ class RocksDBTests: XCTestCase {
 
   override func tearDown() {
     db = nil
-  }
-
-  func testOpenFail() {
-    do {
-      _ = try Database(path: "/foo/bar")
-      XCTFail("Opening database at non-existent path should throw")
-    } catch DBError.OpenFailed {
-      /* success */
-    } catch {
-      XCTFail("Unexpected error type thrown: \(error)")
-    }
-  }
-
-  func testOpenForWriteFail() {
-    do {
-      _ = try Database(path: dbPath)
-      XCTFail("Opening database read-write a second time should throw")
-    } catch DBError.OpenFailed {
-      /* success */
-    } catch {
-      XCTFail("Unexpected error type thrown: \(error)")
-    }
   }
 
   func testGetAndPut() {
@@ -167,15 +145,17 @@ class RocksDBTests: XCTestCase {
     }
   }
 
-  static var allTests : [(String, (RocksDBTests) -> () throws -> Void)] {
+  static var allTests : [(String, (BasicTests) -> () throws -> Void)] {
     return [
       ("testGetAndPut", testGetAndPut),
       ("testNilGet", testNilGet),
       ("testPutOverwrite", testPutOverwrite),
       ("testDelete", testDelete),
       ("testBatchWrite", testBatchWrite),
+      ("testBatchMultiWrite", testBatchWrite),
       ("testIterate", testIterate),
-      ("testIteratePrefix", testIteratePrefix)
+      ("testIteratePrefix", testIteratePrefix),
+      ("testReadSnapshot", testReadSnapshot),
     ]
   }
 }
