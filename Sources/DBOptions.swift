@@ -31,6 +31,10 @@ public class DBReadOptions {
   deinit {
     rocksdb_readoptions_destroy(opts)
   }
+
+  func setReadSnapshot(_ snapshot: DBReadSnapshot) {
+    rocksdb_readoptions_set_snapshot(opts, snapshot.snapshot)
+  }
 }
 
 public class DBWriteOptions {

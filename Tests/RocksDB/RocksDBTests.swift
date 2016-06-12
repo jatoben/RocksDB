@@ -128,6 +128,22 @@ class RocksDBTests: XCTestCase {
     }
   }
 
+  func testReadSnapshot() {
+    do {
+      try db.put("foo", value: "bar")
+      let snap = db.createReadSnapshot()
+      try db.put("baz", value: "quux")
+
+      let readOpts = DBReadOptions()
+      readOpts.setReadSnapshot(snap)
+      XCTAssertEqual(try db.get("foo", options: readOpts) as String?, "bar", "Didn't read expected value with read snapshot")
+      XCTAssertNil(try db.get("baz", options: readOpts) as String?, "Read unexpected value from read snapshot")
+      XCTAssertEqual(try db.get("baz") as String?, "quux", "Didn't read expected value without read snapshot")
+    } catch {
+      XCTFail("\(error)")
+    }
+  }
+
   static var allTests : [(String, (RocksDBTests) -> () throws -> Void)] {
     return [
       ("testGetAndPut", testGetAndPut),
