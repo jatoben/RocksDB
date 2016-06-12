@@ -35,7 +35,7 @@ public class DBBatch {
     rocksdb_writebatch_destroy(batch)
   }
 
-  func put(_ key: DBSlice, value: DBSlice) {
+  public func put(_ key: DBSlice, value: DBSlice) {
     rocksdb_writebatch_put(batch,
       key.dbValue,
       key.dbLength,
@@ -44,15 +44,15 @@ public class DBBatch {
     )
   }
 
-  func put<K: DBSlice, V: DBSlice>(_ entries: [K: V]) {
+  public func put<K: DBSlice, V: DBSlice>(_ entries: [K: V]) {
     entries.forEach { put($0, value: $1) }
   }
 
-  func delete(_ key: DBSlice) {
+  public func delete(_ key: DBSlice) {
     rocksdb_writebatch_delete(batch, key.dbValue, key.dbLength)
   }
 
-  func delete<S: Sequence where S.Iterator.Element == DBSlice>(_ keys: S, options: DBWriteOptions? = nil) {
+  public func delete<S: Sequence where S.Iterator.Element == DBSlice>(_ keys: S, options: DBWriteOptions? = nil) {
     keys.forEach { delete($0) }
   }
 }
@@ -77,7 +77,7 @@ public class Database {
     rocksdb_close(db)
   }
 
-  func put<K: DBSlice, V: DBSlice>(_ key: K, value: V, options: DBWriteOptions? = nil) throws {
+  public func put<K: DBSlice, V: DBSlice>(_ key: K, value: V, options: DBWriteOptions? = nil) throws {
     let opts = options ?? defaultWriteOptions
     var err: UnsafeMutablePointer<Int8>? = nil
     rocksdb_put(db,
@@ -95,7 +95,7 @@ public class Database {
     }
   }
 
-  func write(_ batch: DBBatch, options: DBWriteOptions? = nil) throws {
+  public func write(_ batch: DBBatch, options: DBWriteOptions? = nil) throws {
     let opts = options ?? defaultWriteOptions
     var err: UnsafeMutablePointer<Int8>? = nil
     rocksdb_write(db,
@@ -110,7 +110,7 @@ public class Database {
     }
   }
 
-  func delete<K: DBSlice>(_ key: K, options: DBWriteOptions? = nil) throws {
+  public func delete<K: DBSlice>(_ key: K, options: DBWriteOptions? = nil) throws {
     let opts = options ?? defaultWriteOptions
     var err: UnsafeMutablePointer<Int8>? = nil
     rocksdb_delete(db, opts.opts, key.dbValue, key.dbLength, &err)
@@ -121,7 +121,7 @@ public class Database {
     }
   }
 
-  func get<K: DBSlice, V: DBSlice>(_ key: K, options: DBReadOptions? = nil) throws -> V? {
+  public func get<K: DBSlice, V: DBSlice>(_ key: K, options: DBReadOptions? = nil) throws -> V? {
     let opts = options ?? defaultReadOptions
     var err: UnsafeMutablePointer<Int8>? = nil
     var valLength: Int = 0

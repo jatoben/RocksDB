@@ -3,7 +3,7 @@ import CRocksDB
 public class DBIterator: IteratorProtocol {
   private var iter: OpaquePointer
 
-  internal init(_ iter: OpaquePointer, _ keyPrefix: String? = nil) {
+  private init(_ iter: OpaquePointer, _ keyPrefix: String? = nil) {
     self.iter = iter
 
     if let prefix = keyPrefix {
