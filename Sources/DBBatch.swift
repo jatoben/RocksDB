@@ -16,12 +16,9 @@ public class DBBatch {
   }
 
   public func put(_ key: DBSlice, value: DBSlice) {
-    rocksdb_writebatch_put(batch,
-                           key.dbValue,
-                           key.dbLength,
-                           value.dbValue,
-                           value.dbLength
-    )
+    let k = key.dbValue
+    let v = value.dbValue
+    rocksdb_writebatch_put(batch, k, k.count, v, v.count)
   }
 
   public func put<K: DBSlice, V: DBSlice>(_ entries: [K: V]) {
@@ -29,7 +26,8 @@ public class DBBatch {
   }
 
   public func delete(_ key: DBSlice) {
-    rocksdb_writebatch_delete(batch, key.dbValue, key.dbLength)
+    let k = key.dbValue
+    rocksdb_writebatch_delete(batch, k, k.count)
   }
 
   public func delete<S: Sequence where S.Iterator.Element == DBSlice>(_ keys: S, options: DBWriteOptions? = nil) {

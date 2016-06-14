@@ -50,15 +50,11 @@ public class Database {
 
   public func put<K: DBSlice, V: DBSlice>(_ key: K, value: V, options: DBWriteOptions? = nil) throws {
     let opts = options ?? defaultWriteOptions
+
+    let k = key.dbValue
+    let v = value.dbValue
     var err: UnsafeMutablePointer<Int8>? = nil
-    rocksdb_put(db,
-      opts.opts,
-      key.dbValue,
-      key.dbLength,
-      value.dbValue,
-      value.dbLength,
-      &err
-    )
+    rocksdb_put(db, opts.opts, k, k.count, v, v.count, &err)
 
     guard err == nil else {
       defer { free(err) }
@@ -83,8 +79,10 @@ public class Database {
 
   public func delete<K: DBSlice>(_ key: K, options: DBWriteOptions? = nil) throws {
     let opts = options ?? defaultWriteOptions
+
+    let k = key.dbValue
     var err: UnsafeMutablePointer<Int8>? = nil
-    rocksdb_delete(db, opts.opts, key.dbValue, key.dbLength, &err)
+    rocksdb_delete(db, opts.opts, k, k.count, &err)
 
     guard err == nil else {
       defer { free(err) }
@@ -94,15 +92,11 @@ public class Database {
 
   public func get<K: DBSlice, V: DBSlice>(_ key: K, options: DBReadOptions? = nil) throws -> V? {
     let opts = options ?? defaultReadOptions
-    var err: UnsafeMutablePointer<Int8>? = nil
+
+    let k = key.dbValue
     var valLength: Int = 0
-    let value = rocksdb_get(db,
-      opts.opts,
-      key.dbValue,
-      key.dbLength,
-      &valLength,
-      &err
-    )
+    var err: UnsafeMutablePointer<Int8>? = nil
+    let value = rocksdb_get(db, opts.opts, k, k.count, &valLength, &err)
 
     guard err == nil else {
       defer { free(err) }
