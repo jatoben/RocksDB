@@ -7,6 +7,7 @@ public class DBOptions {
   var parallelism: Int = ParallelismAuto
   var createIfMissing: Bool = true
   var optimizeLevelStyleCompaction: Bool = true
+  var enableStatistics: Bool = false
 
   internal func options() -> OpaquePointer {
     rocksdb_options_set_create_if_missing(opts, createIfMissing ? 1 : 0)
@@ -16,12 +17,22 @@ public class DBOptions {
     if self.optimizeLevelStyleCompaction {
       rocksdb_options_optimize_level_style_compaction(opts, 0);
     }
+    if enableStatistics {
+      rocksdb_options_enable_statistics(opts)
+    }
 
     return opts
   }
 
   deinit {
     rocksdb_options_destroy(opts)
+  }
+
+  public func getStatistics() -> String? {
+    let s = rocksdb_options_statistics_get_string(opts)
+    guard let stats = s else { return nil }
+    defer { free(s) }
+    return String(cString: stats)
   }
 }
 
