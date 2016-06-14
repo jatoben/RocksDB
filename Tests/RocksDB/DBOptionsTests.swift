@@ -13,7 +13,6 @@ extension RocksDBTests {
       try db.put("stats", value: "true")
 
       let stats = opts.getStatistics()
-      print(stats)
       XCTAssertNotNil(stats, "Enabled stats should not be nil")
     } catch {
       XCTFail("\(error)")
