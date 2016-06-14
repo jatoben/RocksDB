@@ -48,6 +48,12 @@ public class Database {
     rocksdb_close(db)
   }
 
+  public func getProperty(_ property: String) -> String? {
+    let p = rocksdb_property_value(db, property)
+    guard let propVal = p else { return nil }
+    return String(cString: propVal)
+  }
+
   public func put<K: DBSlice, V: DBSlice>(_ key: K, value: V, options: DBWriteOptions? = nil) throws {
     let opts = options ?? defaultWriteOptions
 
