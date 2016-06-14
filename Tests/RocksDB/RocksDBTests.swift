@@ -1,19 +1,7 @@
 import XCTest
-import CRocksDB
 @testable import RocksDB
 
-class FailureTests: XCTestCase {
-  var dbPath: String = "/tmp/rocksdb-test"
-  var db: Database!
-
-  override func setUp() {
-    db = try! Database(path: dbPath)
-  }
-
-  override func tearDown() {
-    db = nil
-  }
-
+extension RocksDBTests {
   func testOpenFail() {
     do {
       _ = try Database(path: "/foo/bar")
@@ -38,7 +26,8 @@ class FailureTests: XCTestCase {
 
   func testOpenForReadOnly() {
     do {
-      _ = try Database(path: dbPath, readOnly: true)
+      let dbro = try Database(path: dbPath, readOnly: true)
+      _ = try dbro.get("foo") as String?
       /* success */
     } catch {
       XCTFail("Should be able to open database read-only")
@@ -57,12 +46,46 @@ class FailureTests: XCTestCase {
     }
   }
 
-  static var allTests : [(String, (FailureTests) -> () throws -> Void)] {
-    return [
-      ("testOpenFail", testOpenFail),
-      ("testOpenForWriteFail", testOpenForWriteFail),
-      ("testOpenForReadOnly", testOpenForReadOnly),
-      ("testWriteFail", testWriteFail),
-    ]
+  func testGetAndPut() {
+    do {
+      try db.put("foo", value: "bar")
+      let val = try db.get("foo") as String?
+      XCTAssertEqual(val!, "bar")
+    } catch {
+      XCTFail("\(error)")
+    }
+  }
+
+  func testNilGet() {
+    do {
+      let val = try db.get("baz") as String?
+      XCTAssertEqual(val, nil)
+    } catch {
+      XCTFail("\(error)")
+    }
+  }
+
+  func testPutOverwrite() {
+    do {
+      try db.put("foo", value: "bar")
+      try db.put("foo", value: "baz")
+      let val = try db.get("foo") as String?
+      XCTAssertEqual(val!, "baz")
+    } catch {
+      XCTFail("\(error)")
+    }
+  }
+
+  func testDelete() {
+    do {
+      try db.put("foo", value: "bar")
+      let val = try db.get("foo") as String?
+      XCTAssertEqual(val!, "bar")
+      try db.delete("foo")
+      let val2 = try db.get("foo") as String?
+      XCTAssertNil(val2)
+    } catch {
+      XCTFail("\(error)")
+    }
   }
 }
