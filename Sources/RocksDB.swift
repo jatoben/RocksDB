@@ -51,6 +51,7 @@ public class Database {
   public func getProperty(_ property: String) -> String? {
     let p = rocksdb_property_value(db, property)
     guard let propVal = p else { return nil }
+    defer { free(propVal) }
     return String(cString: propVal)
   }
 
