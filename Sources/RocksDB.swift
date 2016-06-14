@@ -65,11 +65,7 @@ public class Database {
   public func write(_ batch: DBBatch, options: DBWriteOptions? = nil) throws {
     let opts = options ?? defaultWriteOptions
     var err: UnsafeMutablePointer<Int8>? = nil
-    rocksdb_write(db,
-      opts.opts,
-      batch.batch,
-      &err
-    )
+    rocksdb_write(db, opts.opts, batch.batch, &err)
 
     guard err == nil else {
       defer { free(err) }
