@@ -1,5 +1,14 @@
 import CRocksDB
 
+enum LogLevel: Int {
+  case debug  = 0
+  case info   = 1
+  case warn   = 2
+  case error  = 3
+  case fatal  = 4
+  case header = 5
+}
+
 public class DBOptions {
   private var opts: OpaquePointer = rocksdb_options_create()
   static let ParallelismAuto = -1
@@ -8,6 +17,7 @@ public class DBOptions {
   var createIfMissing: Bool = true
   var optimizeLevelStyleCompaction: Bool = true
   var enableStatistics: Bool = false
+  var logLevel: LogLevel? = nil
 
   internal func options() -> OpaquePointer {
     rocksdb_options_set_create_if_missing(opts, createIfMissing ? 1 : 0)
@@ -16,6 +26,9 @@ public class DBOptions {
     rocksdb_options_increase_parallelism(opts, Int32(p))
     if self.optimizeLevelStyleCompaction {
       rocksdb_options_optimize_level_style_compaction(opts, 0);
+    }
+    if let level = logLevel {
+      rocksdb_options_set_info_log_level(opts, Int32(level.rawValue))
     }
     if enableStatistics {
       rocksdb_options_enable_statistics(opts)
