@@ -15,22 +15,30 @@ class RocksDBTests: XCTestCase {
 
   static var allTests : [(String, (RocksDBTests) -> () throws -> Void)] {
     return [
-      /* BasicTests */
-      ("testGetAndPut", testGetAndPut),
-      ("testNilGet", testNilGet),
-      ("testPutOverwrite", testPutOverwrite),
-      ("testDelete", testDelete),
-      ("testBatchWrite", testBatchWrite),
-      ("testBatchMultiWrite", testBatchWrite),
-      ("testIterate", testIterate),
-      ("testIteratePrefix", testIteratePrefix),
-      ("testReadSnapshot", testReadSnapshot),
-
-      /* FailureTests */
+      /* RocksDBTests */
       ("testOpenFail", testOpenFail),
       ("testOpenForWriteFail", testOpenForWriteFail),
       ("testOpenForReadOnly", testOpenForReadOnly),
       ("testWriteFail", testWriteFail),
+      ("testGetProperty", testGetProperty),
+      ("testGetAndPut", testGetAndPut),
+      ("testNilGet", testNilGet),
+      ("testPutOverwrite", testPutOverwrite),
+      ("testDelete", testDelete),
+
+      /* DBBatchTests */
+      ("testBatchWrite", testBatchWrite),
+      ("testBatchMultiWrite", testBatchWrite),
+
+      /* DBIteratorTests */
+      ("testIterate", testIterate),
+      ("testIteratePrefix", testIteratePrefix),
+
+      /* DBOptionsTests */
+      ("testStatistics", testStatistics),
+
+      /* DBReadSnapshotTests */
+      ("testReadSnapshot", testReadSnapshot),
     ]
   }
 }
