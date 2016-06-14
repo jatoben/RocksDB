@@ -6,7 +6,7 @@ extension RocksDBTests {
     do {
       _ = try Database(path: "/foo/bar")
       XCTFail("Opening database at non-existent path should throw")
-    } catch DBError.OpenFailed {
+    } catch DBError.openFailed {
       /* success */
     } catch {
       XCTFail("Unexpected error type thrown: \(error)")
@@ -17,7 +17,7 @@ extension RocksDBTests {
     do {
       _ = try Database(path: dbPath)
       XCTFail("Opening database read-write a second time should throw")
-    } catch DBError.OpenFailed {
+    } catch DBError.openFailed {
       /* success */
     } catch {
       XCTFail("Unexpected error type thrown: \(error)")
@@ -39,7 +39,7 @@ extension RocksDBTests {
       let dbro = try Database(path: dbPath, readOnly: true)
       try dbro.put("foo", value: "bar")
       XCTFail("Writing to a read-only database should throw")
-    } catch DBError.WriteFailed {
+    } catch DBError.writeFailed {
       /* success */
     } catch {
       XCTFail("Unexpected error type thrown: \(error)")

@@ -1,17 +1,17 @@
 import CRocksDB
 
 public enum DBError: ErrorProtocol, CustomStringConvertible {
-  case OpenFailed(String)
-  case ReadFailed(String)
-  case WriteFailed(String)
+  case openFailed(String)
+  case readFailed(String)
+  case writeFailed(String)
 
   public var description: String {
     switch self {
-    case let OpenFailed(s):
+    case let openFailed(s):
       return "Open failed: \(s)"
-    case let ReadFailed(s):
+    case let readFailed(s):
       return "Read failed: \(s)"
-    case let WriteFailed(s):
+    case let writeFailed(s):
       return "Write failed: \(s)"
     }
   }
@@ -31,14 +31,14 @@ public class Database {
 
     guard err == nil else {
       defer { free(err) }
-      throw DBError.OpenFailed(String(cString: err!))
+      throw DBError.openFailed(String(cString: err!))
     }
 
     /* Need this rigamarole to avoid an IUO error because rocksdb_open is
      * typed to return an OpaquePointer!
      */
     guard dbx != nil else {
-      throw DBError.OpenFailed("Unknown error")
+      throw DBError.openFailed("Unknown error")
     }
 
     db = dbx!
@@ -65,7 +65,7 @@ public class Database {
 
     guard err == nil else {
       defer { free(err) }
-      throw DBError.WriteFailed(String(cString: err!))
+      throw DBError.writeFailed(String(cString: err!))
     }
   }
 
@@ -76,7 +76,7 @@ public class Database {
 
     guard err == nil else {
       defer { free(err) }
-      throw DBError.WriteFailed(String(cString: err!))
+      throw DBError.writeFailed(String(cString: err!))
     }
   }
 
@@ -89,7 +89,7 @@ public class Database {
 
     guard err == nil else {
       defer { free(err) }
-      throw DBError.WriteFailed(String(cString: err!))
+      throw DBError.writeFailed(String(cString: err!))
     }
   }
 
@@ -103,7 +103,7 @@ public class Database {
 
     guard err == nil else {
       defer { free(err) }
-      throw DBError.ReadFailed(String(cString: err!))
+      throw DBError.readFailed(String(cString: err!))
     }
 
     guard let val = value else { return nil }
