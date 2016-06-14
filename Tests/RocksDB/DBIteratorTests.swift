@@ -5,6 +5,7 @@ extension RocksDBTests {
   func testIterate() {
     do {
       try db.put("foo", value: "bar")
+      try db.put("baz", value: "quux")
       let kvs = db.map { ($0, $1) }
       XCTAssertTrue(kvs.count > 1, "Iterator didn't return enough keys")
       XCTAssertTrue(kvs.contains { (k, v) in String(k) == "foo" && String(v) == "bar" }, "Iterator didn't contain expected key/value")
