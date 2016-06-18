@@ -7,6 +7,7 @@ let PI = ProcessInfo()
 let FM = FileManager.default()
 
 class RocksDBTests: XCTestCase {
+  var backupPath = DBPath + "/backups"
   var dbPath = DBPath + "/db"
   var db: Database!
 
@@ -41,12 +42,14 @@ class RocksDBTests: XCTestCase {
   }
 
   override func setUp() {
+    try! FM.createDirectory(atPath: backupPath, withIntermediateDirectories: true, attributes: nil)
     try! FM.createDirectory(atPath: dbPath, withIntermediateDirectories: true, attributes: nil)
     db = try! Database(path: dbPath)
   }
 
   override func tearDown() {
     db = nil
+    try! FM.removeItem(atPath: backupPath)
     try! FM.removeItem(atPath: dbPath)
   }
 
@@ -62,6 +65,12 @@ class RocksDBTests: XCTestCase {
       ("testNilGet", testNilGet),
       ("testPutOverwrite", testPutOverwrite),
       ("testDelete", testDelete),
+
+      /* DBBackupEngineTests */
+      ("testCreateBackup", testCreateBackup),
+      ("testPurgeOldBackups", testPurgeOldBackups),
+      ("testRestoreBackup", testRestoreBackup),
+      ("testRestoreNonExistentBackup", testRestoreNonExistentBackup),
 
       /* DBBatchTests */
       ("testBatchWrite", testBatchWrite),
