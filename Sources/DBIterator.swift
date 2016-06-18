@@ -18,10 +18,10 @@ public class DBIterator: IteratorProtocol {
   }
 
   public func next() -> (DBEntry, DBEntry)? {
+    guard rocksdb_iter_valid(iter) != 0 else { return nil }
+
     var keyLength: Int = 0
     var valLength: Int = 0
-
-    guard rocksdb_iter_valid(iter) != 0 else { return nil }
 
     let k = rocksdb_iter_key(iter, &keyLength)
     let v = rocksdb_iter_value(iter, &valLength)
