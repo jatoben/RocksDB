@@ -19,8 +19,9 @@ public enum DBError: ErrorProtocol, CustomStringConvertible {
 
 public class Database {
   internal var db: OpaquePointer
-  internal lazy var defaultReadOptions = DBReadOptions()
-  internal lazy var defaultWriteOptions = DBWriteOptions()
+
+  public lazy var readOptions = DBReadOptions()
+  public lazy var writeOptions = DBWriteOptions()
 
   init(path: String, readOnly: Bool = false, options: DBOptions? = nil) throws {
     let o = options ?? DBOptions()
@@ -56,7 +57,7 @@ public class Database {
   }
 
   public func put<K: DBSlice, V: DBSlice>(_ key: K, value: V, options: DBWriteOptions? = nil) throws {
-    let opts = options ?? defaultWriteOptions
+    let opts = options ?? writeOptions
 
     let k = key.dbValue
     let v = value.dbValue
@@ -70,7 +71,7 @@ public class Database {
   }
 
   public func write(_ batch: DBBatch, options: DBWriteOptions? = nil) throws {
-    let opts = options ?? defaultWriteOptions
+    let opts = options ?? writeOptions
     var err: UnsafeMutablePointer<Int8>? = nil
     rocksdb_write(db, opts.opts, batch.batch, &err)
 
@@ -81,7 +82,7 @@ public class Database {
   }
 
   public func delete<K: DBSlice>(_ key: K, options: DBWriteOptions? = nil) throws {
-    let opts = options ?? defaultWriteOptions
+    let opts = options ?? writeOptions
 
     let k = key.dbValue
     var err: UnsafeMutablePointer<Int8>? = nil
@@ -94,7 +95,7 @@ public class Database {
   }
 
   public func get<K: DBSlice, V: DBSlice>(_ key: K, options: DBReadOptions? = nil) throws -> V? {
-    let opts = options ?? defaultReadOptions
+    let opts = options ?? readOptions
 
     let k = key.dbValue
     var valLength: Int = 0

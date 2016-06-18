@@ -42,10 +42,10 @@ extension Database: Sequence {
   }
 
   public func makeIterator(keyPrefix prefix: String) -> DBIterator {
-    return makeIterator(defaultReadOptions, keyPrefix: prefix)
+    return makeIterator(readOptions, keyPrefix: prefix)
   }
 
   public func makeIterator() -> DBIterator {
-    return makeIterator(defaultReadOptions)
+    return makeIterator(readOptions)
   }
 }
