@@ -1,12 +1,18 @@
 import CRocksDB
 
-enum LogLevel: Int {
+public enum LogLevel: Int {
   case debug  = 0
   case info   = 1
   case warn   = 2
   case error  = 3
   case fatal  = 4
   case header = 5
+}
+
+public enum ReadTier: Int32 {
+  case readAll    = 0
+  case blockCache = 1
+  case persisted  = 2
 }
 
 public class DBOptions {
@@ -52,17 +58,56 @@ public class DBOptions {
 public class DBReadOptions {
   internal var opts = rocksdb_readoptions_create()
 
-  deinit {
-    rocksdb_readoptions_destroy(opts)
+  public var fillCache: Bool = true {
+    didSet {
+      rocksdb_readoptions_set_fill_cache(opts, fillCache ? 1 : 0)
+    }
   }
 
-  func setReadSnapshot(_ snapshot: DBReadSnapshot) {
-    rocksdb_readoptions_set_snapshot(opts, snapshot.snapshot)
+  public var readaheadSize: Int = 0 {
+    didSet {
+      rocksdb_readoptions_set_readahead_size(opts, readaheadSize)
+    }
+  }
+
+  public var readSnapshot: DBReadSnapshot? = nil {
+    didSet {
+      guard let snap = readSnapshot else { return }
+      rocksdb_readoptions_set_snapshot(opts, snap.snapshot)
+    }
+  }
+
+  public var readTier: ReadTier = .readAll {
+    didSet {
+      rocksdb_readoptions_set_read_tier(opts, readTier.rawValue)
+    }
+  }
+
+  public var verifyChecksums: Bool = false {
+    didSet {
+      rocksdb_readoptions_set_verify_checksums(opts, verifyChecksums ? 1 : 0)
+    }
+  }
+
+  deinit {
+    rocksdb_readoptions_destroy(opts)
   }
 }
 
 public class DBWriteOptions {
   internal var opts = rocksdb_writeoptions_create()
+
+  public var disableWAL: Bool = false {
+    didSet {
+      rocksdb_writeoptions_disable_WAL(opts, disableWAL ? 1 : 0)
+    }
+  }
+
+  public var sync: Bool = false {
+    didSet {
+      rocksdb_writeoptions_set_sync(opts, sync ? 1 : 0)
+    }
+  }
 
   deinit {
     rocksdb_writeoptions_destroy(opts)
