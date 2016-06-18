@@ -27,8 +27,8 @@ public class Database {
     let o = options ?? DBOptions()
     var err: UnsafeMutablePointer<Int8>? = nil
     var dbx = readOnly ?
-      rocksdb_open_for_read_only(o.options(), path, 0, &err) :
-      rocksdb_open(o.options(), path, &err)
+      rocksdb_open_for_read_only(o.opts, path, 0, &err) :
+      rocksdb_open(o.opts, path, &err)
 
     guard err == nil else {
       defer { free(err) }

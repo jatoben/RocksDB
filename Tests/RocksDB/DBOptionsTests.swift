@@ -6,7 +6,7 @@ extension RocksDBTests {
     do {
       db = nil
       let opts = DBOptions()
-      opts.enableStatistics = true
+      opts.enableStatistics()
 
       db = try Database(path: dbPath, options: opts)
       try db.put("foo", value: "bar")

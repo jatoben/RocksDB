@@ -1,6 +1,20 @@
 import CRocksDB
 
-public enum LogLevel: Int {
+public enum CompactionStyle: Int32 {
+  case level      = 0
+  case universal  = 1
+}
+
+public enum CompressionType: Int32 {
+  case none   = 0
+  case snappy = 1
+  case zlib   = 2
+  case bz2    = 3
+  case lz4    = 4
+  case lz4hc  = 5
+}
+
+public enum LogLevel: Int32 {
   case debug  = 0
   case info   = 1
   case warn   = 2
@@ -9,42 +23,71 @@ public enum LogLevel: Int {
   case header = 5
 }
 
-public enum ReadTier: Int32 {
-  case readAll    = 0
-  case blockCache = 1
-  case persisted  = 2
+public enum OptimizationStyle {
+  case levelCompaction
+  case levelCompactionWithBudget(Int)
+  case pointLookup
+  case pointLookupWithCacheSize(Int)
+  case universalCompaction
+  case universalCompactionWithBudget(Int)
 }
 
 public class DBOptions {
-  private var opts: OpaquePointer = rocksdb_options_create()
-  static let ParallelismAuto = -1
+  internal var opts: OpaquePointer
 
-  var parallelism: Int = ParallelismAuto
-  var createIfMissing: Bool = true
-  var optimizeLevelStyleCompaction: Bool = true
-  var enableStatistics: Bool = false
-  var logLevel: LogLevel? = nil
+  public var compactionStyle: CompactionStyle = .level {
+    didSet {
+      rocksdb_options_set_compaction_style(opts, compactionStyle.rawValue)
+      switch compactionStyle {
+      case .level:
+        optimizeFor(.levelCompaction)
+      case .universal:
+        optimizeFor(.universalCompaction)
+      }
+    }
+  }
 
-  internal func options() -> OpaquePointer {
-    rocksdb_options_set_create_if_missing(opts, createIfMissing ? 1 : 0)
-    let p = (self.parallelism == DBOptions.ParallelismAuto) ?
-      Int(sysconf(_SC_NPROCESSORS_ONLN)) : self.parallelism
-    rocksdb_options_increase_parallelism(opts, Int32(p))
-    if self.optimizeLevelStyleCompaction {
-      rocksdb_options_optimize_level_style_compaction(opts, 0);
+  public var compression: CompressionType = .none {
+    didSet {
+      rocksdb_options_set_compression(opts, compression.rawValue)
     }
-    if let level = logLevel {
-      rocksdb_options_set_info_log_level(opts, Int32(level.rawValue))
-    }
-    if enableStatistics {
-      rocksdb_options_enable_statistics(opts)
-    }
+  }
 
-    return opts
+  public var createIfMissing: Bool = true {
+    didSet {
+      rocksdb_options_set_create_if_missing(opts, createIfMissing ? 1 : 0)
+    }
+  }
+
+  public var logLevel: LogLevel = .info {
+    didSet {
+      rocksdb_options_set_info_log_level(opts, logLevel.rawValue)
+    }
+  }
+
+  var parallelism: Int = 0 {
+    didSet {
+      let p = parallelism == 0 ? sysconf(_SC_NPROCESSORS_ONLN) : parallelism
+      rocksdb_options_increase_parallelism(opts, Int32(p))
+    }
+  }
+
+  init() {
+    opts = rocksdb_options_create()
+
+    /* Property observers are not called during init */
+    rocksdb_options_set_compaction_style(opts, CompactionStyle.level.rawValue)
+    optimizeFor(.levelCompaction)
+    rocksdb_options_set_create_if_missing(opts, 1)
+    rocksdb_options_increase_parallelism(opts, Int32(sysconf(_SC_NPROCESSORS_ONLN)))
   }
 
   deinit {
     rocksdb_options_destroy(opts)
+  }
+
+  public func enableStatistics() {
+    rocksdb_options_enable_statistics(opts)
   }
 
   public func getStatistics() -> String? {
@@ -53,6 +96,29 @@ public class DBOptions {
     defer { free(s) }
     return String(cString: stats)
   }
+
+  public func optimizeFor(_ style: OptimizationStyle) {
+    switch style {
+    case .levelCompaction:
+      rocksdb_options_optimize_level_style_compaction(opts, 0)
+    case .levelCompactionWithBudget(let budget):
+      rocksdb_options_optimize_level_style_compaction(opts, UInt64(budget))
+    case .pointLookup:
+      rocksdb_options_optimize_for_point_lookup(opts, 0)
+    case .pointLookupWithCacheSize(let cacheSize):
+      rocksdb_options_optimize_for_point_lookup(opts, UInt64(cacheSize))
+    case .universalCompaction:
+      rocksdb_options_optimize_universal_style_compaction(opts, 0)
+    case .universalCompactionWithBudget(let budget):
+      rocksdb_options_optimize_universal_style_compaction(opts, UInt64(budget))
+    }
+  }
+}
+
+public enum ReadTier: Int32 {
+  case readAll    = 0
+  case blockCache = 1
+  case persisted  = 2
 }
 
 public class DBReadOptions {
