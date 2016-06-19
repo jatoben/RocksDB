@@ -62,11 +62,6 @@ extension RocksDBTests {
     }
   }
 
-  func testGetProperty() {
-    let prop = db.getProperty("rocksdb.estimate-num-keys")
-    XCTAssertNotNil(prop, "`rocksdb.estimate-num-keys` property should not be nil")
-  }
-
   func testGetAndPut() {
     do {
       try db.put("foo", value: "bar")

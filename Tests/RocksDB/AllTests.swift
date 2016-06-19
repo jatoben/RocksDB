@@ -76,7 +76,6 @@ class RocksDBTests: XCTestCase {
       ("testOpenForWriteFail", testOpenForWriteFail),
       ("testOpenForReadOnly", testOpenForReadOnly),
       ("testWriteFail", testWriteFail),
-      ("testGetProperty", testGetProperty),
       ("testGetAndPut", testGetAndPut),
       ("testNilGet", testNilGet),
       ("testPutOverwrite", testPutOverwrite),
@@ -95,6 +94,9 @@ class RocksDBTests: XCTestCase {
       /* DBIteratorTests */
       ("testIterate", testIterate),
       ("testIteratePrefix", testIteratePrefix),
+
+      /* DBPropertyTests */
+      ("testGetProperty", testGetProperty),
 
       /* DBOptionsTests */
       ("testStatistics", testStatistics),
