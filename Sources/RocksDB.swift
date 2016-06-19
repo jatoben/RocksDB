@@ -58,7 +58,7 @@ public class Database {
       rocksdb_open(self.options.opts, path, &err)
 
     guard err == nil else {
-      defer { free(err) }
+      defer { rocksdb_free(err) }
       throw DBError.openFailed(String(cString: err!))
     }
 
@@ -79,7 +79,7 @@ public class Database {
   public func getProperty(_ property: String) -> String? {
     let p = rocksdb_property_value(db, property)
     guard let propVal = p else { return nil }
-    defer { free(propVal) }
+    defer { rocksdb_free(propVal) }
     return String(cString: propVal)
   }
 
@@ -92,7 +92,7 @@ public class Database {
     rocksdb_put(db, opts.opts, k, k.count, v, v.count, &err)
 
     guard err == nil else {
-      defer { free(err) }
+      defer { rocksdb_free(err) }
       throw DBError.writeFailed(String(cString: err!))
     }
   }
@@ -103,7 +103,7 @@ public class Database {
     rocksdb_write(db, opts.opts, batch.batch, &err)
 
     guard err == nil else {
-      defer { free(err) }
+      defer { rocksdb_free(err) }
       throw DBError.writeFailed(String(cString: err!))
     }
   }
@@ -116,7 +116,7 @@ public class Database {
     rocksdb_delete(db, opts.opts, k, k.count, &err)
 
     guard err == nil else {
-      defer { free(err) }
+      defer { rocksdb_free(err) }
       throw DBError.writeFailed(String(cString: err!))
     }
   }
@@ -130,12 +130,12 @@ public class Database {
     let value = rocksdb_get(db, opts.opts, k, k.count, &valLength, &err)
 
     guard err == nil else {
-      defer { free(err) }
+      defer { rocksdb_free(err) }
       throw DBError.readFailed(String(cString: err!))
     }
 
     guard let val = value else { return nil }
-    defer { free(val) }
+    defer { rocksdb_free(val) }
     let valPointer = UnsafeBufferPointer(start: val, count: valLength)
     return V(dbValue: [Int8](valPointer))
   }

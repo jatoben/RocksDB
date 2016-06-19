@@ -109,7 +109,7 @@ public class DBOptions {
   public func getStatistics() -> String? {
     let s = rocksdb_options_statistics_get_string(opts)
     guard let stats = s else { return nil }
-    defer { free(s) }
+    defer { rocksdb_free(s) }
     return String(cString: stats)
   }
 

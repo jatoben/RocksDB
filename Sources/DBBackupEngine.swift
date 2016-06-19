@@ -50,7 +50,7 @@ public class DBBackupEngine {
     var be = rocksdb_backup_engine_open(db.options.opts, path, &err)
 
     guard err == nil else {
-      defer { free(err) }
+      defer { rocksdb_free(err) }
       throw DBError.backupFailed(String(cString: err!))
     }
 
@@ -70,7 +70,7 @@ public class DBBackupEngine {
     rocksdb_backup_engine_create_new_backup(engine, db.db, &err)
 
     guard err == nil else {
-      defer { free(err) }
+      defer { rocksdb_free(err) }
       throw DBError.backupFailed(String(cString: err!))
     }
   }
@@ -103,7 +103,7 @@ public class DBBackupEngine {
     rocksdb_backup_engine_purge_old_backups(engine, UInt32(keep), &err)
 
     guard err == nil else {
-      defer { free(err) }
+      defer { rocksdb_free(err) }
       throw DBError.backupFailed(String(cString: err!))
     }
   }
@@ -118,7 +118,7 @@ public class DBBackupEngine {
       &err)
 
     guard err == nil else {
-      defer { free(err) }
+      defer { rocksdb_free(err) }
       throw DBError.backupFailed(String(cString: err!))
     }
   }
