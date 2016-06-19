@@ -97,6 +97,8 @@ class RocksDBTests: XCTestCase {
 
       /* DBPropertyTests */
       ("testGetProperty", testGetProperty),
+      ("testGetCustomProperty", testGetCustomProperty),
+      ("testGetInvalidProperty", testGetInvalidProperty),
 
       /* DBOptionsTests */
       ("testStatistics", testStatistics),
