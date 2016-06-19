@@ -19,6 +19,6 @@ import PackageDescription
 let package = Package(
   name: "RocksDB",
   dependencies: [
-    .Package(url: "../CRocksDB", majorVersion: 1)
+    .Package(url: "https://github.com/jatoben/CRocksDB", majorVersion: 1)
   ]
 )
