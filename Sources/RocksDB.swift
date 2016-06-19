@@ -47,7 +47,7 @@ public class Database {
   public lazy var readOptions = DBReadOptions()
   public lazy var writeOptions = DBWriteOptions()
 
-  init(path: String, readOnly: Bool = false, options: DBOptions? = nil) throws {
+  public init(path: String, readOnly: Bool = false, options: DBOptions? = nil) throws {
     self.options = options ?? DBOptions()
     self.path = path
     self.readOnly = readOnly

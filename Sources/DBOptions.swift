@@ -81,14 +81,14 @@ public class DBOptions {
     }
   }
 
-  var parallelism: Int = 0 {
+  public var parallelism: Int = 0 {
     didSet {
       let p = parallelism == 0 ? sysconf(_SC_NPROCESSORS_ONLN) : parallelism
       rocksdb_options_increase_parallelism(opts, Int32(p))
     }
   }
 
-  init() {
+  public init() {
     opts = rocksdb_options_create()
 
     /* Property observers are not called during init */

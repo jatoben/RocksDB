@@ -23,7 +23,7 @@ public class DBBatch {
     return Int(rocksdb_writebatch_count(batch))
   }
 
-  init() {
+  public init() {
     batch = rocksdb_writebatch_create()
   }
 
