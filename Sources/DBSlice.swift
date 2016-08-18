@@ -29,7 +29,7 @@ public struct DBEntry {
 }
 
 extension String: DBSlice {
-  public var dbValue: [Int8] { return nulTerminatedUTF8.map { Int8($0) }}
+  public var dbValue: [Int8] { return utf8CString.map { Int8($0) }}
 
   public init(dbValue: [Int8]) {
     var val = dbValue

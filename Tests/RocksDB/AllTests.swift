@@ -20,7 +20,7 @@ import XCTest
 
 let DBPath = "/tmp/rocksdb-test"
 let PI = ProcessInfo()
-let FM = FileManager.default()
+let FM = FileManager.default
 
 class RocksDBTests: XCTestCase {
   var backupPath = DBPath + "/backups"
@@ -42,7 +42,7 @@ class RocksDBTests: XCTestCase {
   /* Mount a RAM disk to store database files during a test run */
   override class func setUp() {
     #if os(OSX)
-      let task = Task.launchedTask(withLaunchPath: sourcePath() + "/create-ramdisk-macos.sh", arguments: [DBPath])
+      let task = Process.launchedProcess(launchPath: sourcePath() + "/create-ramdisk-macos.sh", arguments: [DBPath])
       task.waitUntilExit()
       assert(task.terminationStatus == 0)
     #endif
@@ -51,7 +51,7 @@ class RocksDBTests: XCTestCase {
   /* Nuke the RAM disk */
   override class func tearDown() {
     #if os(OSX)
-      let task = Task.launchedTask(withLaunchPath: sourcePath() + "/remove-ramdisk-macos.sh", arguments: [DBPath])
+      let task = Process.launchedProcess(launchPath: sourcePath() + "/remove-ramdisk-macos.sh", arguments: [DBPath])
       task.waitUntilExit()
       assert(task.terminationStatus == 0)
     #endif

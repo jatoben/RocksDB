@@ -46,7 +46,7 @@ public class DBBatch {
     rocksdb_writebatch_delete(batch, k, k.count)
   }
 
-  public func delete<S: Sequence where S.Iterator.Element == DBSlice>(_ keys: S, options: DBWriteOptions? = nil) {
+  public func delete<S: Sequence>(_ keys: S, options: DBWriteOptions? = nil) where S.Iterator.Element == DBSlice {
     keys.forEach { delete($0) }
   }
 }

@@ -16,7 +16,7 @@
  */
 import CRocksDB
 
-public enum DBError: ErrorProtocol, CustomStringConvertible {
+public enum DBError: Error, CustomStringConvertible {
   case backupFailed(String)
   case openFailed(String)
   case readFailed(String)
@@ -25,15 +25,15 @@ public enum DBError: ErrorProtocol, CustomStringConvertible {
 
   public var description: String {
     switch self {
-    case let backupFailed(s):
+    case let .backupFailed(s):
       return "Backup failed: \(s)"
-    case let openFailed(s):
+    case let .openFailed(s):
       return "Open failed: \(s)"
-    case let readFailed(s):
+    case let .readFailed(s):
       return "Read failed: \(s)"
-    case let restoreFailed(s):
+    case let .restoreFailed(s):
       return "Restore failed: \(s)"
-    case let writeFailed(s):
+    case let .writeFailed(s):
       return "Write failed: \(s)"
     }
   }
