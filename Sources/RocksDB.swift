@@ -39,7 +39,22 @@ public enum DBError: Error, CustomStringConvertible {
   }
 }
 
+public enum RocksDBVersions {
+  case version48
+  case version49
+}
+
+/**
+ * The Database class provides an interface to RocksDB, a high-performance, persistent
+ * key-value store.
+ */
 public class Database {
+  #if ROCKSDB49
+  static let libraryVersion = RocksDBVersions.version49
+  #else
+  static let libraryVersion = RocksDBVersions.version48
+  #endif
+
   internal var db: OpaquePointer
   public let options: DBOptions
   public let path: String

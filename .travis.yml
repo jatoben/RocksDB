@@ -3,5 +3,7 @@ matrix:
     - os: osx
       osx_image: xcode8
       language: objective-c # so wrong
-      before_install: brew install snappy && ./install-rocksdb-master.sh
+      before_install:
+        - brew update
+        - brew install rocksdb
       script: swift build -Xlinker -L/usr/local/lib && swift test -Xlinker -L/usr/local/lib
