@@ -146,7 +146,7 @@ public class DBReadOptions {
     }
   }
 
-  #if ROCKSDB_4_9
+  #if ROCKSDB49
   public var readaheadSize: Int = 0 {
     didSet {
       rocksdb_readoptions_set_readahead_size(opts, readaheadSize)
