@@ -146,11 +146,13 @@ public class DBReadOptions {
     }
   }
 
+  #if ROCKSDB_4_9
   public var readaheadSize: Int = 0 {
     didSet {
       rocksdb_readoptions_set_readahead_size(opts, readaheadSize)
     }
   }
+  #endif
 
   public var readSnapshot: DBReadSnapshot? = nil {
     didSet {
