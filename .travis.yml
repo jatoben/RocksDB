@@ -4,4 +4,4 @@ matrix:
       osx_image: xcode8
       language: objective-c # so wrong
       before_install: brew install snappy && ./install-rocksdb-master.sh
-      script: swift build -Xlinker -L/usr/local/lib && swift test
+      script: swift build -Xlinker -L/usr/local/lib && swift test -Xlinker -L/usr/local/lib
