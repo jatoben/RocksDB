@@ -49,12 +49,6 @@ public enum RocksDBVersions {
  * key-value store.
  */
 public class Database {
-  #if ROCKSDB49
-  static let libraryVersion = RocksDBVersions.version49
-  #else
-  static let libraryVersion = RocksDBVersions.version48
-  #endif
-
   internal var db: OpaquePointer
   public let options: DBOptions
   public let path: String
