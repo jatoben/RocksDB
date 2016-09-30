@@ -19,7 +19,7 @@ import XCTest
 @testable import RocksDB
 
 let DBPath = "/tmp/rocksdb-test"
-let PI = ProcessInfo()
+let PI = ProcessInfo.processInfo
 let FM = FileManager.default
 
 class RocksDBTests: XCTestCase {
