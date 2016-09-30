@@ -16,6 +16,11 @@
  */
 import XCTest
 @testable import RocksDB
+#if os(macOS) || os(iOS)
+import Darwin
+#else
+import Glibc
+#endif
 
 extension RocksDBTests {
   func testCreateBackup() {

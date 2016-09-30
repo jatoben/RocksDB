@@ -1,5 +1,5 @@
 import XCTest
-@testable import RocksDBTestSuite
+@testable import RocksDBTests
 
 XCTMain([
   testCase(RocksDBTests.allTests),
