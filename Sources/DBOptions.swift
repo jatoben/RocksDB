@@ -83,7 +83,7 @@ public class DBOptions {
 
   public var parallelism: Int = 0 {
     didSet {
-      let p = parallelism == 0 ? sysconf(_SC_NPROCESSORS_ONLN) : parallelism
+      let p = parallelism == 0 ? sysconf(Int32(_SC_NPROCESSORS_ONLN)) : parallelism
       rocksdb_options_increase_parallelism(opts, Int32(p))
     }
   }
@@ -95,7 +95,7 @@ public class DBOptions {
     rocksdb_options_set_compaction_style(opts, CompactionStyle.level.rawValue)
     optimizeFor(.levelCompaction)
     rocksdb_options_set_create_if_missing(opts, 1)
-    rocksdb_options_increase_parallelism(opts, Int32(sysconf(_SC_NPROCESSORS_ONLN)))
+    rocksdb_options_increase_parallelism(opts, Int32(sysconf(Int32(_SC_NPROCESSORS_ONLN))))
   }
 
   deinit {
