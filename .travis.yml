@@ -6,4 +6,4 @@ matrix:
       before_install:
         - brew update
         - brew install rocksdb
-      script: swift build -Xlinker -L/usr/local/lib && swift test -Xlinker -L/usr/local/lib
+      script: script/test 
