@@ -1,0 +1,4 @@
+# `db` is only 2 chars, but it's a fine variable name
+variable_name:
+  excluded:
+    - db

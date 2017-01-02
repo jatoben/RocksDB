@@ -27,9 +27,12 @@ extension RocksDBTests {
 
       let readOpts = DBReadOptions()
       readOpts.readSnapshot = snap
-      XCTAssertEqual(try db.get("foo-snap", options: readOpts) as String?, "bar", "Didn't read expected value with read snapshot")
-      XCTAssertNil(try db.get("baz-snap", options: readOpts) as String?, "Read unexpected value from read snapshot")
-      XCTAssertEqual(try db.get("baz-snap") as String?, "quux", "Didn't read expected value without read snapshot")
+      XCTAssertEqual(try db.get("foo-snap", options: readOpts) as String?, "bar",
+        "Didn't read expected value with read snapshot")
+      XCTAssertNil(try db.get("baz-snap", options: readOpts) as String?,
+        "Read unexpected value from read snapshot")
+      XCTAssertEqual(try db.get("baz-snap") as String?, "quux",
+        "Didn't read expected value without read snapshot")
     } catch {
       XCTFail("\(error)")
     }
