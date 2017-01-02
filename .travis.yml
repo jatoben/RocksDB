@@ -11,7 +11,7 @@ matrix:
       osx_image: xcode8.2
       before_install:
         - brew update
-        - brew install swiftlint
+        - brew upgrade swiftlint
       script:
         - swiftlint
     - os: linux
