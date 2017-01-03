@@ -1,0 +1,9 @@
+# Force-tries are fine in tests
+disabled_rules:
+  - force_try
+
+variable_name:
+  excluded:
+    - db
+    - PI
+    - FM

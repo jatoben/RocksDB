@@ -112,7 +112,10 @@ public struct DBProperty: RawRepresentable {
   /** The level number that L0 data will be compacted to. */
   public static let baseLevel = DBProperty(rawValue: "rocksdb.base-level")
 
-  /** The estimated bytes that must be rewritten in order to reduce all levels to the target size. Only valid for level-base compaction. */
+  /**
+   * The estimated bytes that must be rewritten in order to reduce all levels to the target size.
+   * Only valid for level-base compaction.
+   */
   public static let pendingCompactionSize = DBProperty(rawValue: "rocksdb.estimate-pending-compaction-bytes")
 
   /** Creates a custom property descriptor. */

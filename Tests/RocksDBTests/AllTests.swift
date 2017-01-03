@@ -69,7 +69,7 @@ class RocksDBTests: XCTestCase {
     try! FM.removeItem(atPath: dbPath)
   }
 
-  static var allTests : [(String, (RocksDBTests) -> () throws -> Void)] {
+  static var allTests: [(String, (RocksDBTests) -> () throws -> Void)] {
     return [
       /* RocksDBTests */
       ("testOpenFail", testOpenFail),
@@ -104,7 +104,7 @@ class RocksDBTests: XCTestCase {
       ("testStatistics", testStatistics),
 
       /* DBReadSnapshotTests */
-      ("testReadSnapshot", testReadSnapshot),
+      ("testReadSnapshot", testReadSnapshot)
     ]
   }
 }
