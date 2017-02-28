@@ -22,4 +22,3 @@ matrix:
         - docker pull jatoben/swiftrocks:latest
       script:
         - docker run -v "$(pwd):/src" jatoben/swiftrocks:latest /src/script/test
-
